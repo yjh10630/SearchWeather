@@ -1,0 +1,90 @@
+package com.jihun.searchweather.main
+
+import android.content.Context
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.jihun.searchweather.ViewType
+import com.jihun.searchweather.data.CityHeader
+import com.jihun.searchweather.data.CityInfo
+import com.jihun.searchweather.data.MainModule
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
+import java.io.FileNotFoundException
+import java.lang.reflect.Type
+
+class MainViewModel: ViewModel() {
+
+    private val compositeDisposable by lazy { CompositeDisposable() }
+
+    private val _cityLiveData: MutableLiveData<List<MainModule>> = MutableLiveData()
+    val cityLiveData: LiveData<List<MainModule>>
+        get() = _cityLiveData
+
+    fun getCityData(context: Context) {
+        Observable.fromCallable { parseJson<List<CityInfo>>(context, "citylist.json") }
+            .subscribeOn(Schedulers.io())
+            .map(::createViewEntity)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {
+                    _cityLiveData.value = it
+                }, {
+                    Log.d("####", "Fail > ${it.message}")
+                }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun createViewEntity(data: List<CityInfo>): MutableList<MainModule> {
+        val modules = mutableListOf<MainModule>()
+        data.distinctBy { it.country }.forEach { sortCountry ->
+            data.filter { it.country == sortCountry.country }.run {
+                if (size != 0) {
+                    modules.add(
+                        MainModule(
+                            type = ViewType.MAIN_ITEM_HEADER,
+                            data = CityHeader(
+                                name = sortCountry.country,
+                                count = size)))
+
+                    forEach { modules.add(
+                        MainModule(
+                            type = ViewType.MAIN_ITEM,
+                            data = it))
+                    }
+                }
+            }
+        }
+        return modules
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.clear()
+    }
+
+
+    private inline fun <reified T> parseJson(context: Context, fileName: String): T {
+        var json: String? = null // 파일 입력에 오류가 있을 경우의 예외처리
+        try {
+            json = context
+                .assets
+                .open(fileName)
+                .bufferedReader()
+                .use {
+                    it.readText()
+                }
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+        val type: Type = object : TypeToken<T>() {}.type
+        return Gson().fromJson(json, type)
+    }
+}
