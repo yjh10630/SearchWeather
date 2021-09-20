@@ -1,4 +1,4 @@
-package com.jihun.searchweather.main
+package com.jihun.searchweather.ui.main
 
 import android.os.Bundle
 import android.text.Editable
@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.jihun.searchweather.databinding.ActivityMainBinding
 import com.jihun.searchweather.util.hideKeyboard
 
@@ -55,9 +57,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
             }
-
             searchRemove.setOnClickListener { removeEditText() }
-
+            moveToTop.setOnClickListener { binding.recyclerView.scrollToPosition(0) }
         }
     }
 
@@ -73,15 +74,24 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         mainViewModel.cityLiveData.observe(this, Observer {
-
+            (binding.recyclerView.adapter as? CityListAdapter)?.items = it
         })
 
         mainViewModel.getCityData(this)
     }
 
     private fun initRecyclerView() {
-
         binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
+            adapter = CityListAdapter()
+
+            addOnScrollListener(object: RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    val itemIdx = (layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition()
+                    showMoveTopBtn(!(itemIdx == 0 || itemIdx == null || adapter?.itemCount == 0))
+                }
+            })
 
             setOnTouchListener { v, event ->
                 hideKeyboard(binding.etSearch)
@@ -89,5 +99,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
+    private fun showMoveTopBtn(isShow: Boolean) { if (isShow) binding.moveToTop.show() else binding.moveToTop.hide() }
 }

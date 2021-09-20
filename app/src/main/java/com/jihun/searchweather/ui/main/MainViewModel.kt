@@ -1,4 +1,4 @@
-package com.jihun.searchweather.main
+package com.jihun.searchweather.ui.main
 
 import android.content.Context
 import android.util.Log
@@ -23,8 +23,8 @@ class MainViewModel: ViewModel() {
 
     private val compositeDisposable by lazy { CompositeDisposable() }
 
-    private val _cityLiveData: MutableLiveData<List<MainModule>> = MutableLiveData()
-    val cityLiveData: LiveData<List<MainModule>>
+    private val _cityLiveData: MutableLiveData<MutableList<MainModule>> = MutableLiveData()
+    val cityLiveData: LiveData<MutableList<MainModule>>
         get() = _cityLiveData
 
     fun getCityData(context: Context) {
