@@ -39,10 +39,10 @@ class MainActivity : AppCompatActivity() {
             etSearch.apply {
                 setOnKeyListener { _, keyCode, event ->
                     if ((event.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                        LandingRouter.move(
+                        /*LandingRouter.move(
                             this@MainActivity,
                             RouterEvent(type = Landing.DETAIL, paramString = etSearch.text.trim().toString())
-                        )
+                        )*/
                         hideKeyboard(this)
                         return@setOnKeyListener true
                     }

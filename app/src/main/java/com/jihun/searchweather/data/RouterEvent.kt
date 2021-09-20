@@ -1,11 +1,13 @@
 package com.jihun.searchweather.data
 
 
-const val INTENT_EXTRA_STRING_PARAM = "intent_extra_string_param"
+const val LAT = "lat"
+const val LONG = "long"
 
 data class RouterEvent (
     val type: Landing,
-    var paramString: String? = null
+    var lat: Double = 0.0,
+    var long: Double = 0.0
 )
 
 enum class Landing {

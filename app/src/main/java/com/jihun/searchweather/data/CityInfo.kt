@@ -16,5 +16,11 @@ data class CityHeader(
 data class CityInfo (
     @SerializedName("id") val id: Int,
     @SerializedName("country") val country: String?,
-    @SerializedName("name") val name: String?
-)
+    @SerializedName("name") val name: String?,
+    @SerializedName("coord") val coord: Coord?
+) {
+    data class Coord(
+        @SerializedName("lat") val lat: Double,
+        @SerializedName("lon") val lon: Double,
+    )
+}

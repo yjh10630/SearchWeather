@@ -18,9 +18,15 @@ class CityItemViewHolder(private val binding: ViewCityItemBinding): BaseViewHold
     private fun initView(data: CityInfo) {
         binding.name.text = data.name ?: ""
         itemView.setOnClickListener {
+
+            if (data.coord == null) {
+                Toast.makeText(itemView.context, "어뜨카지.. 좌표가 없어 검색이 되지 않습니다...", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             LandingRouter.move(
                 itemView.context,
-                RouterEvent(type = Landing.DETAIL, paramString = data.name)
+                RouterEvent(type = Landing.DETAIL, lat = data.coord.lat, long = data.coord.lon)
             )
         }
     }

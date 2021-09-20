@@ -3,9 +3,7 @@ package com.jihun.searchweather.util
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.jihun.searchweather.data.INTENT_EXTRA_STRING_PARAM
-import com.jihun.searchweather.data.Landing
-import com.jihun.searchweather.data.RouterEvent
+import com.jihun.searchweather.data.*
 import com.jihun.searchweather.ui.detail.DetailActivity
 import com.jihun.searchweather.ui.main.MainActivity
 
@@ -33,7 +31,8 @@ object LandingRouter {
 
     private fun gotoDetail(context: Context, event: RouterEvent) {
         context.startActivity(Intent(context, DetailActivity::class.java).apply {
-            putExtra(INTENT_EXTRA_STRING_PARAM, event.paramString)
+            putExtra(LAT, event.lat)
+            putExtra(LONG, event.long)
         })
     }
 }
