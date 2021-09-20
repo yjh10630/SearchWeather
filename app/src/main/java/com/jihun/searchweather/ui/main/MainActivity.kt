@@ -11,7 +11,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.jihun.searchweather.data.Landing
+import com.jihun.searchweather.data.RouterEvent
 import com.jihun.searchweather.databinding.ActivityMainBinding
+import com.jihun.searchweather.util.LandingRouter
 import com.jihun.searchweather.util.hideKeyboard
 
 class MainActivity : AppCompatActivity() {
@@ -36,8 +39,10 @@ class MainActivity : AppCompatActivity() {
             etSearch.apply {
                 setOnKeyListener { _, keyCode, event ->
                     if ((event.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                        //todo 검색
-                        Toast.makeText(this@MainActivity, "검색 > ${etSearch.text.toString()}", Toast.LENGTH_SHORT).show()
+                        LandingRouter.move(
+                            this@MainActivity,
+                            RouterEvent(type = Landing.DETAIL, paramString = etSearch.text.trim().toString())
+                        )
                         hideKeyboard(this)
                         return@setOnKeyListener true
                     }
