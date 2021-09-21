@@ -33,6 +33,7 @@ object LandingRouter {
         context.startActivity(Intent(context, DetailActivity::class.java).apply {
             putExtra(LAT, event.lat)
             putExtra(LONG, event.long)
+            putExtra(CITY, event.city)
         })
     }
 }

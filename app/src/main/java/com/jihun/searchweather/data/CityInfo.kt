@@ -13,6 +13,10 @@ data class CityHeader(
     val count: Int
 )
 
+
+/**
+ * Response Data class
+ */
 data class CityInfo (
     @SerializedName("id") val id: Int,
     @SerializedName("country") val country: String?,

@@ -1,13 +1,14 @@
 package com.jihun.searchweather.ui.detail
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.jihun.searchweather.data.CITY
 import com.jihun.searchweather.data.LAT
 import com.jihun.searchweather.data.LONG
 import com.jihun.searchweather.databinding.ActivityDetailBinding
-import com.jihun.searchweather.util.convertToDate
 
 class DetailActivity: AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
@@ -18,18 +19,31 @@ class DetailActivity: AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
-
         val lat = intent?.getDoubleExtra(LAT, 0.0) ?: 0.0
         val long = intent?.getDoubleExtra(LONG, 0.0) ?: 0.0
-        binding.txt.text = "lat : $lat long : $long"
+        val cityNm = intent?.getStringExtra(CITY) ?: ""
 
-
-
-        viewModel.detailLiveData.observe(this, Observer {
-            binding.txt.text = "${binding.txt.text}\n${it.current?.temp}℃\n${it.current?.dt?.convertToDate(it.timezone)}"
-        })
+        initView(cityNm)
+        initViewModel()
 
         viewModel.getWeatherData(lat, long)
+
+    }
+
+    private fun initViewModel() {
+        viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
+        viewModel.detailLiveData.observe(this, Observer {
+            Log.d("####", "Weather Data Size > ${it.size}")
+        })
+    }
+
+    private fun initView(cityNm: String) {
+        with(binding) {
+            ivBack.setOnClickListener { finish() }
+            tvCityNm.text = cityNm
+
+
+
+        }
     }
 }

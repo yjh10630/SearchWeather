@@ -26,7 +26,7 @@ class CityItemViewHolder(private val binding: ViewCityItemBinding): BaseViewHold
 
             LandingRouter.move(
                 itemView.context,
-                RouterEvent(type = Landing.DETAIL, lat = data.coord.lat, long = data.coord.lon)
+                RouterEvent(type = Landing.DETAIL, lat = data.coord.lat, long = data.coord.lon, city = data.name)
             )
         }
     }
