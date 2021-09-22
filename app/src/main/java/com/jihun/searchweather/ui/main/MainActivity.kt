@@ -5,13 +5,17 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.jihun.searchweather.data.Landing
+import com.jihun.searchweather.data.RouterEvent
 import com.jihun.searchweather.databinding.ActivityMainBinding
 import com.jihun.searchweather.ui.LinearLayoutManagerWrapper
+import com.jihun.searchweather.util.LandingRouter
 import com.jihun.searchweather.util.hideKeyboard
 import com.jihun.searchweather.util.setItemAnimatorDuration
 import io.reactivex.disposables.CompositeDisposable
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity() {
                 setOnKeyListener { _, keyCode, event ->
                     if ((event.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                         hideKeyboard(this)
+                        mainViewModel.searchCityInfo(etSearch.text.trim().toString())
                         return@setOnKeyListener true
                     }
                     return@setOnKeyListener false
@@ -81,6 +86,24 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         mainViewModel.cityLiveData.observe(this, Observer {
             (binding.recyclerView.adapter as? CityListAdapter)?.items = it.map { it.copy() }.toMutableList()
+        })
+        mainViewModel.searchLiveData.observe(this, Observer {
+            it?.let {
+                val lat = it.coord?.lat ?: 0.0
+                val long = it.coord?.lon ?: 0.0
+
+                if (lat == 0.0 || long == 0.0) {
+                    Toast.makeText(this@MainActivity, "도시를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    return@Observer
+                }
+
+                LandingRouter.move(
+                    this,
+                    RouterEvent(type = Landing.DETAIL, lat = lat, long = long, city = it.name)
+                )
+            } ?: run {
+                Toast.makeText(this@MainActivity, "도시를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
         })
 
         mainViewModel.getCityData(this)

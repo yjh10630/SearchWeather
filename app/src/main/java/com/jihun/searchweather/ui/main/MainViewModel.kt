@@ -29,6 +29,10 @@ class MainViewModel: ViewModel() {
     val cityLiveData: LiveData<MutableList<MainModule>>
         get() = _cityLiveData
 
+    private val _searchLiveData: MutableLiveData<CityInfo?> = MutableLiveData()
+    val searchLiveData: LiveData<CityInfo?>
+        get() = _searchLiveData
+
     fun onNextObservable(editTextString: CharSequence) {
         Observable.create<CharSequence> { emitter -> emitter.onNext(editTextString) }
             .debounce(200L, TimeUnit.MILLISECONDS)
@@ -39,6 +43,19 @@ class MainViewModel: ViewModel() {
                 _cityLiveData.value = it
             }, {
                 Log.d("####", "Fail > ${it.message}")
+            })
+            .addTo(compositeDisposable)
+    }
+
+    fun searchCityInfo(keyword: String) {
+        Observable.fromCallable { mainModuleDataSet?.filter { it.type == ViewType.MAIN_ITEM }?.map { (it.data as? CityInfo) }?.toMutableList() }
+            .subscribeOn(Schedulers.computation())
+            .map { it.firstOrNull { it?.name?.lowercase() == keyword.lowercase() } }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                _searchLiveData.value = it
+            }, {
+                _searchLiveData.value = null
             })
             .addTo(compositeDisposable)
     }
