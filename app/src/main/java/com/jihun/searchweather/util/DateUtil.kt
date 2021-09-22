@@ -19,10 +19,11 @@ fun Int.convertToDate(timeZone: String?, format: String): String? {
     return sdf.format(date)
 }
 
-fun String.getDiffDate(format: String?): Int {
-    val sdf = SimpleDateFormat(format, Locale.getDefault())
+fun String.getDiffDate(timeZone: String?, format: String?): Int {
+    val sdf = SimpleDateFormat(format, Locale.getDefault()).apply { this.timeZone = TimeZone.getTimeZone(timeZone) }
     val inputDate = sdf.parse(this)
     val today = Calendar.getInstance().apply {
+        setTimeZone(TimeZone.getTimeZone(timeZone))
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
