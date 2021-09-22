@@ -1,4 +1,4 @@
-package com.jihun.searchweather.ui.main.holder
+package com.jihun.searchweather.ui.base
 
 import com.jihun.searchweather.databinding.ViewEmptyBinding
 import com.jihun.searchweather.ui.base.BaseViewHolder
