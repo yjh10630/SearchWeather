@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.jihun.searchweather.data.CITY
 import com.jihun.searchweather.data.LAT
 import com.jihun.searchweather.data.LONG
@@ -33,7 +34,7 @@ class DetailActivity: AppCompatActivity() {
     private fun initViewModel() {
         viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
         viewModel.detailLiveData.observe(this, Observer {
-            Log.d("####", "Weather Data Size > ${it.size}")
+            (binding.recyclerView.adapter as? DetailListAdapter)?.items = it
         })
     }
 
@@ -42,8 +43,10 @@ class DetailActivity: AppCompatActivity() {
             ivBack.setOnClickListener { finish() }
             tvCityNm.text = cityNm
 
-
-
+            recyclerView.apply {
+                layoutManager = LinearLayoutManager(this@DetailActivity, LinearLayoutManager.VERTICAL, false)
+                adapter = DetailListAdapter()
+            }
         }
     }
 }

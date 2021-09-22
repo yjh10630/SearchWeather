@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginEnd="2dp"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvTemp"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="50dp"
+        android:textStyle="bold"
+        android:layout_marginStart="2dp"
+        app:layout_constraintTop_toTopOf="@id/ivIcon"
+        app:layout_constraintStart_toEndOf="@id/ivIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/ivIcon"
+        tools:text="20"/>
+
+    <TextView
+        android:id="@+id/tvSkyStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@id/ivIcon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="흐림"/>
+
+    <TextView
+        android:id="@+id/tvPop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="15dp"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/tvSkyStatus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvHum"
+        tools:text="강수확률:30%"/>
+
+    <TextView
+        android:id="@+id/tvHum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="15dp"
+        android:layout_marginHorizontal="10dp"
+        app:layout_constraintTop_toBottomOf="@id/tvSkyStatus"
+        app:layout_constraintStart_toEndOf="@id/tvPop"
+        app:layout_constraintEnd_toStartOf="@id/tvWind"
+        tools:text="습도:50%"/>
+
+    <TextView
+        android:id="@+id/tvWind"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="15dp"
+        app:layout_constraintTop_toBottomOf="@id/tvSkyStatus"
+        app:layout_constraintStart_toEndOf="@id/tvHum"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="(북서풍)3.2m/s"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/llSunrise"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        app:cardElevation="0dp"
+        app:cardCornerRadius="10dp"
+        app:cardBackgroundColor="@color/teal_200"
+        app:layout_constraintTop_toBottomOf="@id/tvHum"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/llSunSet">
+
+        <TextView
+            android:id="@+id/tvSunRise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            tools:text="일출\n08:00"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/llSunSet"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:textSize="15dp"
+        app:cardElevation="0dp"
+        app:cardCornerRadius="10dp"
+        app:cardBackgroundColor="@color/teal_700"
+        app:layout_constraintTop_toBottomOf="@id/tvHum"
+        app:layout_constraintStart_toEndOf="@id/llSunrise"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvSunSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textStyle="bold"
+            tools:text="일몰\n19:00"/>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

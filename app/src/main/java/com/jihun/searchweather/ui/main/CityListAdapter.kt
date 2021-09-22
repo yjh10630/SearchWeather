@@ -11,7 +11,7 @@ import com.jihun.searchweather.databinding.ViewEmptyBinding
 import com.jihun.searchweather.ui.base.BaseViewHolder
 import com.jihun.searchweather.ui.main.holder.CityHeaderViewHolder
 import com.jihun.searchweather.ui.main.holder.CityItemViewHolder
-import com.jihun.searchweather.ui.main.holder.EmptyViewHolder
+import com.jihun.searchweather.ui.base.EmptyViewHolder
 
 class CityListAdapter: RecyclerView.Adapter<BaseViewHolder>() {
     var items: MutableList<MainModule>? = null

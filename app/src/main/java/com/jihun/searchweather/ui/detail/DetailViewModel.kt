@@ -29,7 +29,7 @@ class DetailViewModel: ViewModel() {
     fun getWeatherData(lat: Double, long: Double) {
         RetrofitClient.getInstance().getService().requestGetOneCallWeatherData(lat, long)
             .subscribeOn(Schedulers.io())
-            //.doOnNext(::setLogCheckData)
+            .doOnNext(::setLogCheckData)
             .map(::createViewEntity)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -45,7 +45,9 @@ class DetailViewModel: ViewModel() {
 
         with(modules) {
             validateToAddCurrentWeather(data)
+            add(DetailModule(type = ViewType.DIVIDER))
             validateToAddHourlyWeather(data)
+            add(DetailModule(type = ViewType.DIVIDER))
             validateToAddDailyWeather(data)
         }
 
@@ -74,59 +76,101 @@ class DetailViewModel: ViewModel() {
         if (hourlyList.isNullOrEmpty()) return
 
         val tempList = mutableListOf<TimeValueData>().apply {
+            var num = 0 // 날짜 기준값
             hourlyList.forEach {
+
+                val dateDiff = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)?.getDiffDate(DATE_FORMAT_YYYYMMDD) ?: 0
+                if (num != dateDiff) {
+                    add(TimeValueData(type = ViewType.DETAIL_HOURLY_DATE_DIVIDER, value = when(dateDiff) {
+                        1 -> "내일"
+                        2 -> "모레"
+                        else -> ""
+                    }))
+                    num = dateDiff
+                }
+
                 add(TimeValueData(
-                    time = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDDHHMMSS),
-                    value = "${it.temp.toInt()}°"
+                    time = it.dt.convertToDate(data.timezone, DATE_FORMAT_HH),
+                    value = "${it.temp.toInt()}°",
+                    iconUrl = "http://openweathermap.org/img/wn/${it.weather?.getOrNull(0)?.icon ?: ""}@2x.png"
                 ))
             }
         }
 
         val humList = mutableListOf<TimeValueData>().apply {
+            var num = 0 // 날짜 기준값
             hourlyList.forEach {
+
+                val dateDiff = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)?.getDiffDate(DATE_FORMAT_YYYYMMDD) ?: 0
+                if (num != dateDiff) {
+                    add(TimeValueData(type = ViewType.DETAIL_HOURLY_DATE_DIVIDER, value = when(dateDiff) {
+                        1 -> "내일"
+                        2 -> "모레"
+                        else -> ""
+                    }))
+                    num = dateDiff
+                }
+
                 add(TimeValueData(
-                    time = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDDHHMMSS),
+                    time = it.dt.convertToDate(data.timezone, DATE_FORMAT_HH),
                     value = "${it.humidity}%"
                 ))
             }
         }
 
         val windList = mutableListOf<TimeValueData>().apply {
+            var num = 0 // 날짜 기준값
             hourlyList.forEach {
+
+                val dateDiff = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)?.getDiffDate(DATE_FORMAT_YYYYMMDD) ?: 0
+                if (num != dateDiff) {
+                    add(TimeValueData(type = ViewType.DETAIL_HOURLY_DATE_DIVIDER, value = when(dateDiff) {
+                        1 -> "내일"
+                        2 -> "모레"
+                        else -> ""
+                    }))
+                    num = dateDiff
+                }
+
                 add(TimeValueData(
-                    time = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDDHHMMSS),
-                    value = "(${WindType.values().getOrNull((((it.windDeg) + 22.5 * 0.5) / 22.5).toInt())?.codeNm})${it.windSpeed}m/s"
+                    time = it.dt.convertToDate(data.timezone, DATE_FORMAT_HH),
+                    //value = "(${WindType.values().getOrNull((((it.windDeg) + 22.5 * 0.5) / 22.5).toInt())?.codeNm})${it.windSpeed}m/s"
+                    value = "${it.windSpeed}m/s"
                 ))
             }
         }
 
         val popList = mutableListOf<TimeValueData>().apply {
+            var num = 0 // 날짜 기준값
             hourlyList.forEach {
+
+                val dateDiff = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)?.getDiffDate(DATE_FORMAT_YYYYMMDD) ?: 0
+                if (num != dateDiff) {
+                    add(TimeValueData(type = ViewType.DETAIL_HOURLY_DATE_DIVIDER, value = when(dateDiff) {
+                        1 -> "내일"
+                        2 -> "모레"
+                        else -> ""
+                    }))
+                    num = dateDiff
+                }
+
                 add(TimeValueData(
-                    time = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDDHHMMSS),
+                    time = it.dt.convertToDate(data.timezone, DATE_FORMAT_HH),
                     value = "${it.pop.toInt()}%"
                 ))
             }
         }
 
-        val tabList = mutableListOf<String>().apply {
-            if (!tempList.isNullOrEmpty()) this.add("온도")
-            if (!humList.isNullOrEmpty()) this.add("습도")
-            if (!windList.isNullOrEmpty()) this.add("바람")
-            if (!popList.isNullOrEmpty()) this.add("강수")
+        val tabList = mutableListOf<TabItem>().apply {
+            if (!tempList.isNullOrEmpty()) this.add(TabItem(tabNm = "온도", isSelected = true, contentList = tempList))
+            if (!humList.isNullOrEmpty()) this.add(TabItem(tabNm = "습도", contentList = humList))
+            if (!windList.isNullOrEmpty()) this.add(TabItem(tabNm = "바람", contentList = windList))
+            if (!popList.isNullOrEmpty()) this.add(TabItem(tabNm = "강수", contentList = popList))
         }
 
-        val hourlyData = DetailHourlyWeather(
-            tabList = tabList,
-            tempList = tempList,
-            humList = humList,
-            windList = windList,
-            popList = popList
-        )
+        val hourlyData = DetailHourlyWeather(tabList = tabList)
 
-        add(DetailModule(type = ViewType.DETAIL_HOURLY_WEATHER_TAB, data = hourlyData))
-        add(DetailModule(type = ViewType.DETAIL_HOURLY_WEATHER_CONTENT, data = tempList))
-
+        add(DetailModule(type = ViewType.DETAIL_HOURLY_WEATHER, data = hourlyData))
     }
 
     private fun MutableList<DetailModule>.validateToAddDailyWeather(data: DetailInfo) {
@@ -134,12 +178,20 @@ class DetailViewModel: ViewModel() {
         if (daily.isNullOrEmpty()) return
 
         daily.forEach {
+
+            val diff = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)?.getDiffDate(DATE_FORMAT_YYYYMMDD)
+            val day = when(diff) {
+                0 -> "오늘"
+                1 -> "내일"
+                else -> it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)?.getDateDay(data.timezone, DATE_FORMAT_YYYYMMDD)
+            }
+
             val dailyData = DetailDailyWeather(
-                date = it.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD),
+                date = "$day ${it.dt.convertToDate(data.timezone, DATE_FORMAT_MMDOTDD)}",
                 iconUrl = "http://openweathermap.org/img/wn/${it.weather?.getOrNull(0)?.icon ?: ""}@2x.png",
                 tempMin = "${it.temp?.min?.toInt()}°",
                 tempMax = "${it.temp?.max?.toInt()}°",
-                pop = "${it.pop.toInt()}%"
+                pop = "${(it.pop*100).toInt()}%"
             )
             add(DetailModule(type = ViewType.DETAIL_DAILY_WEATHER, data = dailyData))
         }
@@ -164,7 +216,7 @@ class DetailViewModel: ViewModel() {
 
         Log.d("####", "\n--------- Hourly Weather(온도) ---------\n")
         data.hourly?.forEach { hourly ->
-            Log.d("####", "시간 : ${hourly.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDDHHMMSS)} 온도 : ${hourly.temp}")
+            Log.d("####", "시간차이 : ${hourly.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)?.getDiffDate(DATE_FORMAT_YYYYMMDD)} 온도 : ${hourly.temp}")
         }
 
         Log.d("####", "\n--------- Hourly Weather(습도) ---------\n")
@@ -185,7 +237,15 @@ class DetailViewModel: ViewModel() {
 
         Log.d("####", "\n--------- daily Weather ---------\n")
         data.daily?.forEach { daliy ->
-            Log.d("####", "시간 : ${daliy.dt?.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)} 온도 - 최저 : ${daliy.temp?.min} / 최고 : ${daliy.temp?.max} / 강수확률 : ${daliy.pop}")
+
+            val diff = daliy.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)?.getDiffDate(DATE_FORMAT_YYYYMMDD)
+            val date = when(diff) {
+                0 -> "오늘"
+                1 -> "내일"
+                else -> daliy.dt.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)?.getDateDay(data.timezone, DATE_FORMAT_YYYYMMDD)
+            }
+
+            Log.d("####", "시간 : ($date)${daliy.dt?.convertToDate(data.timezone, DATE_FORMAT_YYYYMMDD)} 온도 - 최저 : ${daliy.temp?.min} / 최고 : ${daliy.temp?.max} / 강수확률 : ${daliy.pop}")
         }
     }
 

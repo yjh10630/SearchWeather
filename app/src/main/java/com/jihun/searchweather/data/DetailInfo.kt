@@ -5,7 +5,7 @@ import com.jihun.searchweather.ViewType
 
 data class DetailModule(
     var type: ViewType = ViewType.EMPTY,
-    var data: Any? = null,
+    var data: Any? = null
 )
 
 // 현재 날씨 Model
@@ -22,17 +22,21 @@ data class DetailCurrentWeather(
 
 // 시간별 날씨 Model
 data class DetailHourlyWeather(
-    val tabList: List<String>?,
-    var selectedIndex: Int = 0,
-    var tempList: List<TimeValueData>? = null,
-    var humList: List<TimeValueData>? = null,
-    var windList: List<TimeValueData>? = null,
-    var popList: List<TimeValueData>? = null
+    val tabList: List<TabItem>?,
+    var selectedIndex: Int = 0
+)
+
+data class TabItem(
+    val tabNm: String?,
+    var isSelected: Boolean = false,
+    var contentList: List<TimeValueData>?
 )
 
 data class TimeValueData(
-    val time: String?,
-    val value: String?
+    val type: ViewType = ViewType.DETAIL_HOURLY_CONTENT,
+    val time: String? = null,
+    val value: String?,
+    val iconUrl: String? = null
 )
 
 // 일별 날씨 ( 주간 예보 ) Model
