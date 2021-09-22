@@ -24,7 +24,6 @@ class DetailListAdapter: RecyclerView.Adapter<BaseViewHolder>() {
                     field = value
                 }
             }
-            //todo diffutil
             notifyDataSetChanged()
         }
     override fun getItemCount(): Int = items?.size ?: 0
