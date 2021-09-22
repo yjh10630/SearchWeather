@@ -6,6 +6,7 @@ enum class ViewType {
 
     MAIN_ITEM_HEADER,
     MAIN_ITEM,
+    MAIN_AUTO_COMPLETE_ITEM,
 
     DETAIL_CURRENT_WEATHER,
 

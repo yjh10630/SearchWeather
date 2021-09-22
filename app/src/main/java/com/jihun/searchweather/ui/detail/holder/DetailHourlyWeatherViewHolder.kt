@@ -14,7 +14,7 @@ import com.jihun.searchweather.databinding.*
 import com.jihun.searchweather.ui.base.BaseViewHolder
 import com.jihun.searchweather.ui.base.EmptyViewHolder
 import com.jihun.searchweather.util.HorizontalMarginDecoration
-import com.jihun.searchweather.util.diffUtilExtensions
+import com.jihun.searchweather.util.diffUpDate
 import com.jihun.searchweather.util.toPx
 
 class DetailHourlyWeatherViewHolder(private val binding: ViewDetailHourlyWeatherBinding): BaseViewHolder(binding.root) {
@@ -79,13 +79,12 @@ class DetailHourlyWeatherViewHolder(private val binding: ViewDetailHourlyWeather
         var items: MutableList<TabItem>? = null
             set(value) {
                 value?.let {
-                    diffUtilExtensions(field, it,
+                    diffUpDate(field, it,
                         itemCompare = { o, n ->
                             o?.tabNm == n?.tabNm
                         }, contentCompare = { o, n ->
                             o?.isSelected == n?.isSelected
                         })
-
                     field?.let {
                         it.clear()
                         it.addAll(value)
@@ -127,7 +126,7 @@ class DetailHourlyWeatherViewHolder(private val binding: ViewDetailHourlyWeather
         var items: MutableList<TimeValueData>? = null
             set(value) {
                 value?.let {
-                    diffUtilExtensions(field, it,
+                    diffUpDate(field, it,
                         itemCompare = { o, n -> o?.type == n?.type },
                         contentCompare = { o, n -> o == n})
                     field?.let {

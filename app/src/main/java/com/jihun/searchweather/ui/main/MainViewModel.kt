@@ -18,14 +18,44 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import java.io.FileNotFoundException
 import java.lang.reflect.Type
+import java.util.concurrent.TimeUnit
 
 class MainViewModel: ViewModel() {
 
     private val compositeDisposable by lazy { CompositeDisposable() }
+    private var mainModuleDataSet: MutableList<MainModule>? = null
 
     private val _cityLiveData: MutableLiveData<MutableList<MainModule>> = MutableLiveData()
     val cityLiveData: LiveData<MutableList<MainModule>>
         get() = _cityLiveData
+
+    fun onNextObservable(editTextString: CharSequence) {
+        Observable.create<CharSequence> { emitter -> emitter.onNext(editTextString) }
+            .debounce(200L, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.computation())
+            .map(::createViewAutoComplete)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                _cityLiveData.value = it
+            }, {
+                Log.d("####", "Fail > ${it.message}")
+            })
+            .addTo(compositeDisposable)
+    }
+
+    private fun createViewAutoComplete(txt: CharSequence): MutableList<MainModule>? {
+        if (txt.isEmpty()) return mainModuleDataSet
+
+        val module = mutableListOf<MainModule>()
+        val cityData = mainModuleDataSet?.filter { it.type == ViewType.MAIN_ITEM }?.map { (it.data as? CityInfo) }?.toMutableList()
+
+        cityData?.filter {
+            it?.name?.lowercase()?.contains(txt.toString().lowercase()) == true
+        }?.take(10)?.forEach {
+            module.add(MainModule(type = ViewType.MAIN_ITEM, data = it?.copy(inputKeyword = txt.toString())))
+        }
+        return module
+    }
 
     fun getCityData(context: Context) {
         Observable.fromCallable { parseJson<List<CityInfo>>(context, "citylist.json") }
@@ -42,9 +72,9 @@ class MainViewModel: ViewModel() {
             .addTo(compositeDisposable)
     }
 
-    private fun createViewEntity(data: List<CityInfo>): MutableList<MainModule> {
+    private fun createViewEntity(data: List<CityInfo>?): MutableList<MainModule> {
         val modules = mutableListOf<MainModule>()
-        data.distinctBy { it.country }.forEach { sortCountry ->
+        data?.distinctBy { it.country }?.forEach { sortCountry ->
             data.filter { it.country == sortCountry.country }.run {
                 if (size != 0) {
                     modules.add(
@@ -62,6 +92,7 @@ class MainViewModel: ViewModel() {
                 }
             }
         }
+        mainModuleDataSet = modules
         return modules
     }
 

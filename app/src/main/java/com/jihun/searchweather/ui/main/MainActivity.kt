@@ -5,22 +5,22 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.jihun.searchweather.data.Landing
-import com.jihun.searchweather.data.RouterEvent
 import com.jihun.searchweather.databinding.ActivityMainBinding
-import com.jihun.searchweather.util.LandingRouter
+import com.jihun.searchweather.ui.LinearLayoutManagerWrapper
 import com.jihun.searchweather.util.hideKeyboard
+import com.jihun.searchweather.util.setItemAnimatorDuration
+import io.reactivex.disposables.CompositeDisposable
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mainViewModel: MainViewModel
+    private val compositeDisposable by lazy { CompositeDisposable() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,16 +33,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onDestroy() {
+        compositeDisposable.clear()
+        super.onDestroy()
+    }
+
     private fun initView() {
 
         with(binding) {
             etSearch.apply {
                 setOnKeyListener { _, keyCode, event ->
                     if ((event.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                        /*LandingRouter.move(
-                            this@MainActivity,
-                            RouterEvent(type = Landing.DETAIL, paramString = etSearch.text.trim().toString())
-                        )*/
                         hideKeyboard(this)
                         return@setOnKeyListener true
                     }
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
                                 true -> { binding.searchRemove.visibility = View.GONE }
                                 false -> { binding.searchRemove.visibility = View.VISIBLE }
                             }
+                            mainViewModel.onNextObservable(it)
                         }
                     }
                 })
@@ -77,9 +79,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun initViewModel() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
         mainViewModel.cityLiveData.observe(this, Observer {
-            (binding.recyclerView.adapter as? CityListAdapter)?.items = it
+            (binding.recyclerView.adapter as? CityListAdapter)?.items = it.map { it.copy() }.toMutableList()
         })
 
         mainViewModel.getCityData(this)
@@ -87,8 +88,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun initRecyclerView() {
         binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
-            adapter = CityListAdapter()
+            layoutManager = LinearLayoutManagerWrapper(this@MainActivity, LinearLayoutManager.VERTICAL, false)
+            adapter = CityListAdapter(compositeDisposable).apply {
+                registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+                    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                        scrollToPosition(0)
+                    }
+                })
+            }
+
+            itemAnimator = setItemAnimatorDuration(100L)
 
             addOnScrollListener(object: RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

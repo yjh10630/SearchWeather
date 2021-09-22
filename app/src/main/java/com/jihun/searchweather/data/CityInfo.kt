@@ -21,7 +21,8 @@ data class CityInfo (
     @SerializedName("id") val id: Int,
     @SerializedName("country") val country: String?,
     @SerializedName("name") val name: String?,
-    @SerializedName("coord") val coord: Coord?
+    @SerializedName("coord") val coord: Coord?,
+    var inputKeyword: String? = null
 ) {
     data class Coord(
         @SerializedName("lat") val lat: Double,
