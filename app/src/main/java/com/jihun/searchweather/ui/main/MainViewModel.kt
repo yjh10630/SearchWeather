@@ -44,16 +44,17 @@ class MainViewModel: ViewModel() {
     }
 
     private fun createViewAutoComplete(txt: CharSequence): MutableList<MainModule>? {
+        if (txt.isEmpty()) return mainModuleDataSet
+
         val module = mutableListOf<MainModule>()
         val cityData = mainModuleDataSet?.filter { it.type == ViewType.MAIN_ITEM }?.map { (it.data as? CityInfo) }?.toMutableList()
 
         cityData?.filter {
             it?.name?.lowercase()?.contains(txt.toString().lowercase()) == true
         }?.take(10)?.forEach {
-            module.add(MainModule(type = ViewType.MAIN_ITEM, data = it))
+            module.add(MainModule(type = ViewType.MAIN_ITEM, data = it?.copy(inputKeyword = txt.toString())))
         }
-
-        return if (module.isNullOrEmpty()) mainModuleDataSet else module
+        return module
     }
 
     fun getCityData(context: Context) {
@@ -63,7 +64,6 @@ class MainViewModel: ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
-                    mainModuleDataSet = it
                     _cityLiveData.value = it
                 }, {
                     Log.d("####", "Fail > ${it.message}")
@@ -72,9 +72,9 @@ class MainViewModel: ViewModel() {
             .addTo(compositeDisposable)
     }
 
-    private fun createViewEntity(data: List<CityInfo>): MutableList<MainModule> {
+    private fun createViewEntity(data: List<CityInfo>?): MutableList<MainModule> {
         val modules = mutableListOf<MainModule>()
-        data.distinctBy { it.country }.forEach { sortCountry ->
+        data?.distinctBy { it.country }?.forEach { sortCountry ->
             data.filter { it.country == sortCountry.country }.run {
                 if (size != 0) {
                     modules.add(
@@ -92,6 +92,7 @@ class MainViewModel: ViewModel() {
                 }
             }
         }
+        mainModuleDataSet = modules
         return modules
     }
 
