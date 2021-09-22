@@ -39,10 +39,6 @@ class MainActivity : AppCompatActivity() {
             etSearch.apply {
                 setOnKeyListener { _, keyCode, event ->
                     if ((event.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                        /*LandingRouter.move(
-                            this@MainActivity,
-                            RouterEvent(type = Landing.DETAIL, paramString = etSearch.text.trim().toString())
-                        )*/
                         hideKeyboard(this)
                         return@setOnKeyListener true
                     }
@@ -58,6 +54,7 @@ class MainActivity : AppCompatActivity() {
                                 true -> { binding.searchRemove.visibility = View.GONE }
                                 false -> { binding.searchRemove.visibility = View.VISIBLE }
                             }
+                            mainViewModel.onNextObservable(it)
                         }
                     }
                 })
@@ -77,7 +74,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun initViewModel() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
         mainViewModel.cityLiveData.observe(this, Observer {
             (binding.recyclerView.adapter as? CityListAdapter)?.items = it
         })

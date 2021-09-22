@@ -6,7 +6,13 @@ import com.jihun.searchweather.ViewType
 data class MainModule(
     var type: ViewType = ViewType.EMPTY,
     var data: Any? = null,
-)
+) {
+    fun getDeepCopy(): MainModule =
+        MainModule(
+            type = type,
+            data = (data as? CityInfo)?.copy()
+        )
+}
 
 data class CityHeader(
     val name: String?,
