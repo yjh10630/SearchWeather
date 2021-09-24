@@ -1,7 +1,5 @@
 package com.jihun.searchweather.api
 
-import com.jihun.searchweather.data.DetailInfo
-import io.reactivex.Observable
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -28,8 +26,6 @@ class RetrofitClient {
         fun getInstance(): RetrofitClient {
             return retrofitClient
         }
-        const val MAS_RETRIES = 3
-        const val RETRY_DELAY_MILLIS = 1000
     }
 
     fun getService(): RetrofitService = retrofitService

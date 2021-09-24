@@ -1,6 +1,5 @@
 package com.jihun.searchweather.ui.main.holder
 
-import android.view.View
 import android.widget.Toast
 import com.jihun.searchweather.data.CityInfo
 import com.jihun.searchweather.data.Landing
@@ -17,15 +16,6 @@ class CityItemViewHolder(private val binding: ViewCityItemBinding): BaseViewHold
     }
 
     private fun initView(data: CityInfo) {
-        /*binding.name.text = if (data.inputKeyword?.isEmpty() == true) {
-            data.name ?: ""
-        } else {
-            getSpannedColorText(
-                origin = data.name ?: "",
-                changed = data.inputKeyword ?: "",
-                color = Color.parseColor("#4d6ee4")
-            )
-        }*/
         binding.name.text = data.name ?: ""
 
         itemView.setOnClickListener {
