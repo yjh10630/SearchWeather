@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
                                 true -> { binding.searchRemove.visibility = View.GONE }
                                 false -> { binding.searchRemove.visibility = View.VISIBLE }
                             }
+                            compositeDisposable.clear()
                             mainViewModel.onNextObservable(it)
                         }
                     }
